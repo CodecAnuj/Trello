@@ -21,4 +21,10 @@ app.use(express.static("public")); // to Make a folder publicly accessible over 
 
 app.use(cookieParser()); // basically to perform CRUD operations over clients cookie from clients browser , means to access or set cookies
 
+// ----------------------------- route imports ---------------------------------------------------
+import userRouter from "./routes/user.routes.js";
+
+// ----------------------------- route declaration -----------------------------------------------
+app.use("/api/v1/users", userRouter);
+
 export { app };

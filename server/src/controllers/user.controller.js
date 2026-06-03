@@ -1,0 +1,57 @@
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/ApiError.js";
+import { User } from "../models/user.model.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+
+const registerUser = asyncHandler(async (req, res) => {
+  // ----- steps to perform to register a user -----
+  /*
+        1. get user details from frontend
+        2. validation - non-empty
+        3. check if user already exists: username, email
+        4. check for images or avatars and upload them to cloudinary { optional }
+        5. remove password and refresh token field from response
+        6. check for user creation
+        7. return response
+    */
+
+  const { fullName, email, username, password } = req.body;
+  console.log("email: ", email);
+
+  if (
+    [fullName, email, username, password].some((field) => field?.trim() === "")
+  ) {
+    throw new ApiError(400, "All fields are required");
+  }
+
+  const existedUser = User.findOne({
+    $or: [{ username }, { email }],
+  });
+
+  if (existedUser) {
+    throw new ApiError(409, "User with this email or username already exists");
+  }
+
+  // here we creates the user object to store in db ...
+
+  const user = User.create({
+    fullName,
+    email,
+    password,
+    username: username.toLowerCase(),
+  });
+
+  // here we checks if the user object is created or not , if its created then remove password and refreshtoken field by using select method { its syntax is kind of wierd as it accepts a string in which we have to pass the fields we dont wants with "-" symbol , as all are selected by default }
+
+  const createdUser = User.findById(user._id).select("-password -refreshToken");
+
+  if (!createdUser) {
+    throw new ApiError(500, "something went wrong while registering the user");
+  }
+
+  return res
+    .status(201)
+    .json(new ApiResponse(200, createdUser, "User registered Successfully"));
+});
+
+export { registerUser };
