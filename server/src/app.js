@@ -13,9 +13,9 @@ app.use(
 );
 
 app.use(express.json({ limit: "16kb" })); // to limit json data , express.json is a middleware to parse json data
-app.use(express.urlencoded()); // it is a middleware converts (parses) that raw data( basically form data ) into a usable JavaScript object
+// app.use(express.urlencoded()); // it is a middleware converts (parses) that raw data( basically form data ) into a usable JavaScript object
 
-// app.use(express.urlencoded({ extends: true}));  extends: true allows supports nested objects
+app.use(express.urlencoded({ extends: true})); //  extends: true allows supports nested objects
 
 app.use(express.static("public")); // to Make a folder publicly accessible over HTTP
 

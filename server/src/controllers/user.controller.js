@@ -16,7 +16,7 @@ const registerUser = asyncHandler(async (req, res) => {
     */
 
   const { fullName, email, username, password } = req.body;
-  console.log("email: ", email);
+  // console.log(req.body);
 
   if (
     [fullName, email, username, password].some((field) => field?.trim() === "")
@@ -24,7 +24,7 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "All fields are required");
   }
 
-  const existedUser = User.findOne({
+  const existedUser = await User.findOne({
     $or: [{ username }, { email }],
   });
 
@@ -34,7 +34,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // here we creates the user object to store in db ...
 
-  const user = User.create({
+  const user = await User.create({
     fullName,
     email,
     password,
@@ -43,7 +43,9 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // here we checks if the user object is created or not , if its created then remove password and refreshtoken field by using select method { its syntax is kind of wierd as it accepts a string in which we have to pass the fields we dont wants with "-" symbol , as all are selected by default }
 
-  const createdUser = User.findById(user._id).select("-password -refreshToken");
+  const createdUser = await User.findById(user._id).select(
+    "-password -refreshToken",
+  );
 
   if (!createdUser) {
     throw new ApiError(500, "something went wrong while registering the user");
