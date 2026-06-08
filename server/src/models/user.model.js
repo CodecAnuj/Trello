@@ -50,7 +50,7 @@ const userSchema = new Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password")) return next;
   this.password = await bcrypt.hash(this.password, 10);
 }); // first parameter is a functionallity that u wanna perform like save , delete etc , second one is callback , always use normal function here as arrow function doesnt have context of this keyword , that was needed the most
 
